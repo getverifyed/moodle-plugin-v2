@@ -45,6 +45,10 @@ function verifyed_add_instance($verifyed) {
     $verifyed_course_map->verifyed_course_id = $verifyed_course_id;
     $DB->insert_record('verifyed_course_map', $verifyed_course_map);
 
+    // Save plugin instance to database
+    $verifyed->templateid = $verifyed->templateid;
+    $verifyed->id = $DB->insert_record('verifyed', $verifyed);
+
     return $verifyed->id;
 }
 
