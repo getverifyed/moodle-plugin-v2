@@ -157,3 +157,18 @@ function verifyed_has_certificate($user_id, $course_id) {
 
     return $count > 0;
 }
+
+/**
+ * Function for adding plugin settings to the course administration block
+ *
+ * @param settings_navigation $settingsnav
+ * @param context_course $context
+ */
+function verifyed_extend_settings_navigation(settings_navigation $settingsnav, context_course $context) {
+    if (has_capability('moodle/course:update', $context)) {
+        $url = new moodle_url('/mod/verifyed/settings.php', array('contextid' => $context->id));
+        $node = navigation_node::create(get_string('pluginadministration', 'mod_verifyed'), $url, navigation_node::TYPE_SETTING,
+            null, null, new pix_icon('t/edit', ''));
+        $settingsnav->add_node($node, 'courseadmin');
+    }
+}

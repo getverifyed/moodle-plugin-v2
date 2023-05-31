@@ -9,3 +9,5 @@ $string['pluginadministration'] = 'VerifyEd administration';
 $string['messagealreadyissued'] = 'It appears you already have a certificate for this course. If you think this is a mistake, contact your institution.';
 $string['templateid'] = 'Template ID';
 $string['templateid_help'] = 'Enter the VerifyEd template ID for this course.';
+$string['apikey'] = 'API Key';
+$string['apikey_desc'] = 'Enter your VerifyEd API key.';
