@@ -37,17 +37,21 @@ function verifyed_add_instance($verifyed) {
     );
 
     // Create a course in VerifyEd
-    $verifyed_course_id = verifyed_create_course($course_data);
+    $verifyed_course_response = verifyed_create_course($course_data);
+
+    // If the VerifyEd course creation failed, throw an exception
+    if ($verifyed_course_response['result'] === false) {
+        throw new moodle_exception('error_verifyed_course_creation', 'mod_verifyed');
+    }
 
     // Save VerifyEd course ID to database
     $verifyed_course_map = new stdClass();
     $verifyed_course_map->course_id = $verifyed->course;
-    $verifyed_course_map->verifyed_course_id = $verifyed_course_id;
+    $verifyed_course_map->verifyed_course_id = $verifyed_course_response['message'];
     $DB->insert_record('verifyed_course_map', $verifyed_course_map);
 
     // Save plugin instance to database
     $verifyed->templateid = $verifyed->templateid;
-    $verifyed->id = $DB->insert_record('verifyed', $verifyed);
 
     return $verifyed->id;
 }
@@ -78,7 +82,7 @@ function verifyed_create_course($course_data) {
     $data = json_encode($course_data);
 
     // Initialize cURL session
-    $ch = curl_init('https://api.verifyed.io/external/courses?apiKey=' . urlencode(get_config('verifyed', 'apikey')) . '&type=institution');
+    $ch = curl_init('https://api.verifyed.io/external/courses?apiKey=' . get_config('mod_verifyed', 'apikey') . '&type=institution');
 
     // Set cURL options
     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
@@ -91,13 +95,26 @@ function verifyed_create_course($course_data) {
 
     // Execute cURL request and close the session
     $response = curl_exec($ch);
+    $http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
 
     // Decode the JSON response
     $result = json_decode($response, true);
 
-    // Return the VerifyEd course ID
-    return $result['data']['id'];
+    // Check if the API request was successful
+    if ($http_status === 201 && isset($result['data']) && isset($result['data']['id'])) {
+        // Return the VerifyEd course ID
+        return array(
+            "result" => true,
+            "message" => $result['data']['id']
+        );
+    } else {
+        // Log error message and return false
+        return array(
+            "result" => false,
+            "message" => "VerifyEd API Error: Failed to create the course. Response: " . print_r($result, true)
+        );
+    }
 }
 
 /**
@@ -111,7 +128,7 @@ function verifyed_issue_certificate($certificate_data) {
     $data = json_encode($certificate_data);
 
     // Initialize cURL session
-    $ch = curl_init('https://api.verifyed.io/external/issue-credentials?apiKey=' . urlencode(get_config('verifyed', 'apikey')) . '&type=partner');
+    $ch = curl_init('https://api.verifyed.io/external/issue-credentials?apiKey=' . get_config('mod_verifyed', 'apikey') . '&type=partner');
 
     // Set cURL options
     curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
@@ -171,4 +188,14 @@ function verifyed_extend_settings_navigation(settings_navigation $settingsnav, c
             null, null, new pix_icon('t/edit', ''));
         $settingsnav->add_node($node, 'courseadmin');
     }
+}
+
+/**
+ * Returns the custom renderer class for mod_verifyed.
+ *
+ * @param stdClass $page The page object to get the renderer.
+ * @return mod_verifyed_renderer The custom renderer instance.
+ */
+function verifyed_get_renderer($page) {
+    return $page->get_renderer('mod_verifyed');
 }

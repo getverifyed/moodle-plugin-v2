@@ -11,3 +11,4 @@ $string['templateid'] = 'Template ID';
 $string['templateid_help'] = 'Enter the VerifyEd template ID for this course.';
 $string['apikey'] = 'API Key';
 $string['apikey_desc'] = 'Enter your VerifyEd API key.';
+$string['errorverifyedcoursecreation'] = 'Error creating the course in VerifyEd. Please contact the site administrator.';
