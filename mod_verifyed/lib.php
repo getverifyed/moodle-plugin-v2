@@ -17,6 +17,8 @@ function verifyed_add_instance($verifyed) {
     // Get course data from Moodle
     $moodle_course = $DB->get_record('course', array('id' => $verifyed->course), 'fullname, shortname, summary');
 
+    debugging("MOODLE COURSE IS THIS: " . print_r($moodle_course, true), DEBUG_DEVELOPER);
+
     // Set course data based on requirements
     $course_data = array(
         "name" => $moodle_course->fullname,
@@ -48,6 +50,9 @@ function verifyed_add_instance($verifyed) {
     $verifyed_course_map = new stdClass();
     $verifyed_course_map->course_id = $verifyed->course;
     $verifyed_course_map->verifyed_course_id = $verifyed_course_response['message'];
+
+    debugging("VERIFYED COURSE MAP IS THIS: " . print_r($verifyed_course_map, true), DEBUG_DEVELOPER);
+
     $DB->insert_record('verifyed_course_map', $verifyed_course_map);
 
     // Save plugin instance to database
@@ -198,4 +203,26 @@ function verifyed_extend_settings_navigation(settings_navigation $settingsnav, c
  */
 function verifyed_get_renderer($page) {
     return $page->get_renderer('mod_verifyed');
+}
+
+/**
+ * Deletes an instance of the verifyed module
+ *
+ * @param int $id The instance ID of the verifyed module
+ * @return bool true on success, false otherwise
+ */
+function verifyed_delete_instance($id) {
+    global $DB;
+
+    if (!$verifyed_instance = $DB->get_record('verifyed', array('id' => $id))) {
+        return false;
+    }
+
+    // Delete related data from the verifyed_course_map table
+    $DB->delete_records('verifyed_course_map', array('course_id' => $verifyed_instance->course));
+
+    // Delete the verifyed instance
+    $DB->delete_records('verifyed', array('id' => $verifyed_instance->id));
+
+    return true;
 }
