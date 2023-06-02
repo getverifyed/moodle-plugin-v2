@@ -17,8 +17,6 @@ function verifyed_add_instance($verifyed) {
     // Get course data from Moodle
     $moodle_course = $DB->get_record('course', array('id' => $verifyed->course), 'fullname, shortname, summary');
 
-    debugging("MOODLE COURSE IS THIS: " . print_r($moodle_course, true), DEBUG_DEVELOPER);
-
     // Set course data based on requirements
     $course_data = array(
         "name" => $moodle_course->fullname,
@@ -51,12 +49,11 @@ function verifyed_add_instance($verifyed) {
     $verifyed_course_map->course_id = $verifyed->course;
     $verifyed_course_map->verifyed_course_id = $verifyed_course_response['message'];
 
-    debugging("VERIFYED COURSE MAP IS THIS: " . print_r($verifyed_course_map, true), DEBUG_DEVELOPER);
-
     $DB->insert_record('verifyed_course_map', $verifyed_course_map);
 
     // Save plugin instance to database
     $verifyed->templateid = $verifyed->templateid;
+    $verifyed->name = $verifyed->name;
 
     return $verifyed->id;
 }

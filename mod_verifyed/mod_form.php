@@ -15,6 +15,11 @@ class mod_verifyed_mod_form extends moodleform_mod {
         $mform->setType('templateid', PARAM_INT);
         $mform->addRule('templateid', null, 'required', null, 'client');
 
+        // Add a field for the instance name
+        $mform->addElement('text', 'name', get_string('name', 'mod_verifyed'));
+        $mform->setType('name', PARAM_TEXT);
+        $mform->addRule('name', null, 'required', null, 'client');
+
         // Add standard course module elements
         $this->standard_coursemodule_elements();
 
