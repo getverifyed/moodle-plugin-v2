@@ -5,13 +5,15 @@
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/lib.php');
 require_once($CFG->libdir.'/gradelib.php');
+require_once($CFG->dirroot.'/grade/report/user/lib.php');
+require_once($CFG->libdir.'/grade/grade_item.php');
+require_once($CFG->libdir.'/grade/grade_grade.php');
 
-$gid = required_param('gid', PARAM_INT); // Course Module ID
+$id = required_param('id', PARAM_INT); // Course Module ID
 
 // Load the course module and context
-if ($cm = get_coursemodule_from_id('verifyed', $gid, 0, true)) {
-    $context = context_module::instance($cm->id);
-}
+$cm = get_coursemodule_from_id('verifyed', $id, 0, true);
+$context = context_module::instance($cm->id);
 
 // Check if the user has the capability to view this page
 require_login($cm->course, true, $cm);
@@ -20,8 +22,10 @@ require_capability('mod/verifyed:view', $context);
 // Get VerifyEd course ID from the database
 $verifyed_course_id = $DB->get_field('verifyed_course_map', 'verifyed_course_id', array('course_id' => $cm->course));
 
-// Query the final course grade for the user
-$course_grade = grade_get_course_grades($cm->course, $USER->id);
+// Gets the learner's course grade
+$course_item = grade_item::fetch_course_item($cm->course);
+$grades = grade_grade::fetch_users_grades($course_item, array($USER->id), true);
+$course_grade = isset($grades[0]) ? $grades[0] : null;
 
 // Check and format the learner's outcome
 $outcome = isset($course_grade) && isset($course_grade->grades) ? (string) $course_grade->grades[$USER->id]->grade : "Complete";
@@ -29,7 +33,7 @@ $outcome = isset($course_grade) && isset($course_grade->grades) ? (string) $cour
 global $DB;
 
 // Retrieve the template ID from the verifyed instance
-$template_id = $DB->get_field('verifyed', 'templateid', array('course' => $course_id));
+$template_id = $DB->get_field('verifyed', 'templateid', array('course' => $cm->course));
 
 // Check if the user has already requested a certificate
 if (!verifyed_has_certificate($USER->id, $cm->course)) {

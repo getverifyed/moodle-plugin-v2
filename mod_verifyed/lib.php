@@ -183,12 +183,17 @@ function verifyed_has_certificate($user_id, $course_id) {
  * @param settings_navigation $settingsnav
  * @param context_course $context
  */
-function verifyed_extend_settings_navigation(settings_navigation $settingsnav, context_course $context) {
-    if (has_capability('moodle/course:update', $context)) {
-        $url = new moodle_url('/mod/verifyed/settings.php', array('contextid' => $context->id));
-        $node = navigation_node::create(get_string('pluginadministration', 'mod_verifyed'), $url, navigation_node::TYPE_SETTING,
-            null, null, new pix_icon('t/edit', ''));
-        $settingsnav->add_node($node, 'courseadmin');
+function verifyed_extend_settings_navigation(settings_navigation $settingsnav, navigation_node $contextnode) {
+    // Check whether we can get a context_course instance from the cm node.
+    // If we can, display the settings navigation.
+    $cmnode = $contextnode->get($contextnode->key, 'course');
+    if ($cmnode && $context = context_course::instance($cmnode->key)) {        
+        if (has_capability('moodle/course:update', $context)) {
+            $url = new moodle_url('/mod/verifyed/settings.php', array('contextid' => $context->id));
+            $node = navigation_node::create(get_string('pluginadministration', 'mod_verifyed'), $url, navigation_node::TYPE_SETTING,
+                null, null, new pix_icon('t/edit', ''));
+            $settingsnav->add_node($node, 'courseadmin');
+        }
     }
 }
 
