@@ -120,46 +120,6 @@ function verifyed_create_course($course_data) {
 }
 
 /**
- * Issue a certificate in VerifyEd
- *
- * @param array $certificate_data
- * @return void
- */
-function verifyed_issue_certificate($certificate_data) {
-    // Prepare JSON data for the API request
-    $data = json_encode($certificate_data);
-
-    // Initialize cURL session
-    $ch = curl_init('https://api.verifyed.io/external/issue-credentials?apiKey=' . get_config('mod_verifyed', 'apikey') . '&type=partner');
-
-    // Set cURL options
-    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
-    curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-        'Content-Type: application/json',
-        'Content-Length: ' . strlen($data))
-    );
-
-    // Execute cURL request and close the session
-    $response = curl_exec($ch);
-    $http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
-
-    // Decode the JSON response
-    $result = json_decode($response, true);
-
-    // Check if the certificate has been issued successfully
-    if ($http_status === 200 && isset($result['learnerData']) && !empty($result['learnerData'])) {
-        // Display success message
-        echo html_writer::tag('p', 'Your certificate has been issued. Check your emails for a link to see it.');
-    } else {
-        // Display error message
-        echo html_writer::tag('p', 'Sorry, your certificate could not be issued right now. You should contact your institution to resolve the problem and claim your certificate.');
-    }
-}
-
-/**
  * Check whether a student already has a certificate issued
  *
  * @param int $user_id
@@ -194,6 +154,71 @@ function verifyed_extend_settings_navigation(settings_navigation $settingsnav, n
                 null, null, new pix_icon('t/edit', ''));
             $settingsnav->add_node($node, 'courseadmin');
         }
+    }
+}
+
+function verifyed_request_certificate($cm, $verifyed_course_id, $template_id, $USER, $outcome) {
+    global $DB;
+
+    // Prepare the certificate data
+    $certificate_data = array(
+        "templateId" => $template_id,
+        "courseId" => (string) $verifyed_course_id,
+        "learningPathwayId" => null,
+        "public" => false,
+        "studentData" => array(
+            array(
+                "email" => $USER->email,
+                "name" => fullname($USER),
+                "outcome" => $outcome,
+                "completionDate" => date("Y-m-d\TH:i:s\Z"),
+                "additionalInfo" => array()
+            ),
+        ),
+    );
+
+    // Issue the certificate by calling VerifyEd API
+    verifyed_issue_certificate($certificate_data);
+}
+
+/**
+ * Issue a certificate in VerifyEd
+ *
+ * @param array $certificate_data
+ * @return void
+ */
+function verifyed_issue_certificate($certificate_data) {
+    // Prepare JSON data for the API request
+    $data = json_encode($certificate_data);
+
+    // Initialize cURL session
+    $ch = curl_init('https://api.verifyed.io/external/issue-credentials?apiKey=' . get_config('mod_verifyed', 'apikey') . '&type=institution');
+
+    // Set cURL options
+    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "POST");
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+        'Content-Type: application/json',
+        'Content-Length: ' . strlen($data))
+    );
+
+    // Execute cURL request and close the session
+    $response = curl_exec($ch);
+    $http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+    curl_close($ch);
+
+    // Decode the JSON response
+    $result = json_decode($response, true);
+
+    // Check if the certificate has been issued successfully
+    if ($http_status === 201 && isset($result['learnerData']) && !empty($result['learnerData'])) {
+        // Display success message
+        echo html_writer::tag('p', 'Your certificate has been issued. Check your emails for a link to see it.');
+    } else {
+        // Display error message
+        echo html_writer::tag('p', 'Sorry, your certificate could not be issued right now. You should contact your institution to resolve the problem and claim your certificate.');
     }
 }
 
