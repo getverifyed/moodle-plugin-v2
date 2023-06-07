@@ -14,4 +14,5 @@ $string['name_help'] = 'Enter a unique name for this plugin instance.';
 $string['apikey'] = 'API Key';
 $string['apikey_desc'] = 'Enter your VerifyEd API key.';
 $string['errorverifyedcoursecreation'] = 'Error creating the course in VerifyEd. Please contact the site administrator.';
-$string['message_not_ready'] = 'Sorry, you are not eligible for your certificate yet. Please try again later, or contact your institution if you think this is a mistake.';
+$string['messagenotready'] = 'Sorry, you are not eligible for your certificate yet. Please try again later, or contact your institution if you think this is a mistake.';
+$string['messagesuccess'] = 'Congratulations! Your certificate has been issued. Check your emails for a link to it.';

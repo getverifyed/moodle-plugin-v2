@@ -26,11 +26,24 @@ if ($outcome != null) {
     $template_id = $DB->get_field('verifyed', 'templateid', array('course' => $cm->course));
 
     // Request a certificate by calling the verifyed_request_certificate function
-    verifyed_request_certificate($cm, $verifyed_course_id, $template_id, $USER, $outcome);
+    $certificate_issued = verifyed_request_certificate($cm, $verifyed_course_id, $template_id, $USER, $outcome);
 
-    // Redirect user back to the view page
-    redirect(new moodle_url('/mod/verifyed/view.php', array('id' => $cmid)));
+    if ($certificate_issued) {
+        // Store the certificate record in the verifyed_certificates database table
+        $certificate_record = new stdClass();
+        $certificate_record->userid = $USER->id;
+        $certificate_record->courseid = $cm->course;
+        $certificate_record->timecreated = time();
+        $DB->insert_record('verifyed_certificates', $certificate_record);
+    
+        // Show success message and redirect back to course page in 6 seconds
+        echo html_writer::tag('p', get_string('messagesuccess', 'mod_verifyed'));
+        redirect(new moodle_url('/course/view.php', array('id' => $cm->course)), get_string('messagesuccess', 'mod_verifyed'), 6);
+    } else {
+        // Redirect user back to the view page with an error message
+        redirect(new moodle_url('/mod/verifyed/view.php', array('id' => $cmid)), get_string('messagenotready', 'mod_verifyed'));
+    }
 } else {
     // Redirect user back to the view page with an error message
-    redirect(new moodle_url('/mod/verifyed/view.php', array('id' => $cmid)), get_string('message_not_ready', 'mod_verifyed'));
+    redirect(new moodle_url('/mod/verifyed/view.php', array('id' => $cmid)), get_string('messagenotready', 'mod_verifyed'));
 }

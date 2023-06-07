@@ -178,7 +178,9 @@ function verifyed_request_certificate($cm, $verifyed_course_id, $template_id, $U
     );
 
     // Issue the certificate by calling VerifyEd API
-    verifyed_issue_certificate($certificate_data);
+    $certificate_issued = verifyed_issue_certificate($certificate_data);
+
+    return $certificate_issued;
 }
 
 /**
@@ -216,9 +218,11 @@ function verifyed_issue_certificate($certificate_data) {
     if ($http_status === 201 && isset($result['learnerData']) && !empty($result['learnerData'])) {
         // Display success message
         echo html_writer::tag('p', 'Your certificate has been issued. Check your emails for a link to see it.');
+        return true;
     } else {
         // Display error message
         echo html_writer::tag('p', 'Sorry, your certificate could not be issued right now. You should contact your institution to resolve the problem and claim your certificate.');
+        return false;
     }
 }
 

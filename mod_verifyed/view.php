@@ -1,5 +1,4 @@
 <?php
-
 // Code for loading the course context, checking user permissions, and handling the request for the certificate issuance
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/lib.php');
@@ -43,12 +42,12 @@ if (!verifyed_has_certificate($USER->id, $cm->course)) {
         $claim_certificate_url = new moodle_url('/mod/verifyed/claim_certificate.php',
             array('cmid' => $cm->id, 'course' => $cm->course, 'sesskey' => sesskey(), 'outcome' => $outcome));
         echo html_writer::tag('a', 'Claim my certificate',
-            array('href' => $claim_certificate_url, 'class' => 'btn btn-primary'));
+            array('href' => $claim_certificate_url, 'class' => 'basic-btn basic-btn-primary'));
     } else {
         // Show a message that the user is not eligible yet
-        echo html_writer::tag('p', 'Sorry, you\'re not eligible for your certificate yet.');
+        echo html_writer::tag('p', get_string('messagenotready', 'mod_verifyed'), ['class' => 'info-paragraph']);
     }
 } else {
     // Display a message that the user already has a certificate
-    echo html_writer::tag('p', get_string('message_already_issued', 'mod_verifyed'));
+    echo html_writer::tag('p', get_string('messagealreadyissued', 'mod_verifyed'), ['class' => 'info-paragraph']);
 }

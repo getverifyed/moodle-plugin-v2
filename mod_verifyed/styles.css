@@ -1,0 +1,27 @@
+.basic-btn {
+    padding: 12px 24px;
+    margin: 40px auto;
+    display: block;
+    font-family: Roboto, sans-serif;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s ease-out;
+    font-size: 18px;
+}
+
+.basic-btn-primary {
+    background-color: #4567DA;
+    color: #fff;
+}
+
+.basic-btn-primary:hover {
+    background-color: #2F4FCC;
+}
+
+.info-paragraph {
+    font-size: 18px;
+    margin: 40px auto;
+    max-width: 400px;
+    font-family: Roboto, sans-serif;
+    color: #141437;
+}
