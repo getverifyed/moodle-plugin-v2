@@ -36,9 +36,8 @@ if ($outcome != null) {
         $certificate_record->timecreated = time();
         $DB->insert_record('verifyed_certificates', $certificate_record);
     
-        // Show success message and redirect back to course page in 6 seconds
-        echo html_writer::tag('p', get_string('messagesuccess', 'mod_verifyed'));
-        redirect(new moodle_url('/course/view.php', array('id' => $cm->course)), get_string('messagesuccess', 'mod_verifyed'), 6);
+        // Redirects the user with a success message
+        redirect(new moodle_url('/course/view.php', array('id' => $cm->course)), get_string('messagesuccess', 'mod_verifyed'));
     } else {
         // Redirect user back to the view page with an error message
         redirect(new moodle_url('/mod/verifyed/view.php', array('id' => $cmid)), get_string('messagenotready', 'mod_verifyed'));

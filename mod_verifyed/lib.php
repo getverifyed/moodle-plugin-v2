@@ -65,10 +65,47 @@ function verifyed_add_instance($verifyed) {
  * @return bool
  */
 function verifyed_update_instance($verifyed) {
-    global $DB;
+    global $DB, $CFG;
+
+    require_once($CFG->dirroot.'/lib/filelib.php');
+
+    // Set the id property
+    $verifyed->id = $verifyed->instance;
+
+    // Process intro editor fields
+    $draftitemid = file_get_submitted_draft_itemid('introeditor');
+    file_prepare_draft_area(
+        $draftitemid,
+        context_module::instance($verifyed->coursemodule)->id,
+        'mod_verifyed',
+        'intro',
+        0,
+        array('subdirs' => 0, 'maxfiles' => 0)
+    );
+    $verifyed->intro = file_save_draft_area_files(
+        $draftitemid,
+        context_module::instance($verifyed->coursemodule)->id,
+        'mod_verifyed',
+        'intro',
+        0,
+        array('subdirs' => 0, 'maxfiles' => 0),
+        $verifyed->introeditor['text']
+    );
+    $verifyed->introformat = $verifyed->introeditor['format'];
 
     // Update plugin instance in the database
     $DB->update_record('verifyed', $verifyed);
+
+    // Update intro files
+    file_postupdate_standard_editor(
+        $verifyed,
+        'intro',
+        array('subdirs' => 0, 'maxfiles' => 0),
+        context_module::instance($verifyed->coursemodule)->id,
+        'mod_verifyed',
+        'intro',
+        0
+    );
 
     return true;
 }

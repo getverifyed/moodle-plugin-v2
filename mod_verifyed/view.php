@@ -41,13 +41,12 @@ if (!verifyed_has_certificate($USER->id, $cm->course)) {
         // Show a button to the user to claim their certificate
         $claim_certificate_url = new moodle_url('/mod/verifyed/claim_certificate.php',
             array('cmid' => $cm->id, 'course' => $cm->course, 'sesskey' => sesskey(), 'outcome' => $outcome));
-        echo html_writer::tag('a', 'Claim my certificate',
-            array('href' => $claim_certificate_url, 'class' => 'basic-btn basic-btn-primary'));
+        redirect($claim_certificate_url);
     } else {
         // Show a message that the user is not eligible yet
-        echo html_writer::tag('p', get_string('messagenotready', 'mod_verifyed'), ['class' => 'info-paragraph']);
+        redirect(new moodle_url('/course/view.php', array('id' => $cm->course)), get_string('messagenotready', 'mod_verifyed'));
     }
 } else {
     // Display a message that the user already has a certificate
-    echo html_writer::tag('p', get_string('messagealreadyissued', 'mod_verifyed'), ['class' => 'info-paragraph']);
+    redirect(new moodle_url('/course/view.php', array('id' => $cm->course)), get_string('messagealreadyissued', 'mod_verifyed'));
 }
