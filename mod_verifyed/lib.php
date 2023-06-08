@@ -294,3 +294,60 @@ function verifyed_delete_instance($id) {
 
     return true;
 }
+
+/**
+ * Get certificate templates from VerifyEd API
+ *
+ * @return array
+ */
+function get_certificate_templates() {
+    $api_key = get_config('mod_verifyed', 'apikey');
+
+    if (empty($api_key)) {
+        return array();
+    }
+
+    $response = make_get_request('https://api.verifyed.io/external/certificates/templates', $api_key);
+
+    if ($response['result'] === false) {
+        return array();
+    }
+
+    $templates = $response['data'];
+
+    $template_list = array();
+    if (is_array($templates) && count($templates) > 0) {
+        foreach ($templates as $template) {
+            $template_list[$template['id']] = $template['name'];
+        }
+    }
+    return $template_list;
+}
+
+/**
+ * Makes a GET request to a specific URL and returns an associative array with the response data.
+ *
+ * @param string $url
+ * @param string $api_key
+ * @return array
+ */
+function make_get_request($url, $api_key) {
+    $ch = curl_init($url . '?apiKey=' . $api_key . '&type=institution');
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    $response = curl_exec($ch);
+    $http_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    if ($http_status === 200) {
+        $result = json_decode($response, true);
+        return array(
+            'result' => true,
+            'data' => $result['data'],
+        );
+    } else {
+        return array(
+            'result' => false,
+            'message' => 'API Error: Failed to get certificate templates. Response: ' . print_r($result, true),
+        );
+    }
+}
