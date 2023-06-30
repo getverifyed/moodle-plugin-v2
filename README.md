@@ -23,7 +23,7 @@ Initial setup is then complete, and the plugin is installed and ready to be adde
 
 # Using the plugin
 The plugin has two key features:
-1. It will automatically create a new course in VeirfyEd when you install the plugin for a course instance, and,
+1. It will automatically create a new course in VerifyEd when you install the plugin for a course instance, and,
 2. Depending on your rules, learners can claim their digital certificates automatically when they meet the appropriate completion level.
 
 To use the plugin, do this:
