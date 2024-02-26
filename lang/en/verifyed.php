@@ -17,3 +17,5 @@ $string['errorverifyedcoursecreation'] = 'Error creating the course in VerifyEd.
 $string['messagenotready'] = 'Sorry, you are not eligible for your certificate yet. Please try again later, or contact your institution if you think this is a mistake.';
 $string['messagesuccess'] = 'Congratulations! Your certificate has been issued. Check your emails for a link to it.';
 $string['templateidnotfound'] = 'No certificate templates found. Please check your API key and check your certificate templates, then try again.';
+$string['verifyed:view'] = 'View VerifyEd';
+$string['verifyed:addinstance'] = 'Add a VerifyEd instance';
